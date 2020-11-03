@@ -16,7 +16,7 @@ export class PokemonService {
     if (pagina <= 0) {
       pagina = 1;
     }
-    return this.httpClient.get(`${this.url}?offset=${pagina}`);
+    return this.httpClient.get(`${this.url}?limit=10&offset=${pagina}`);
   }
 
   public buscarPokemon(url: string) {
