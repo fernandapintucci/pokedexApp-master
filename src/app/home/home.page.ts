@@ -8,38 +8,57 @@ import { PokemonService } from '../services/pokemon.service';
 })
 export class HomePage {
 
-  // Código realizado com ajuda da aluna Sarita Breda
-
   public pagina = 1;
-  public totalPagina = 105;
+  public totalPaginas = 0;
 
-  public listaPokemonExibir: any = [];
-  public totalPokemon: number;
+  public next: string;
+  public previous: string;
 
-  private url = "https://pokeapi.co/api/v2/pokemon?limit=10&offset=0";
+  public listaPokemonExibir = [];
 
-  constructor(private pokemonService: PokemonService) { }
+  public listaPokemonApi = [];
 
-  ionViewWillEnter() {
-    this.buscarPokemons(1);
+  constructor(private pokemonService: PokemonService) {
+    this.buscarPokemons();
   }
 
-  public buscarPokemons(pagina: number) {
-    if (pagina <= 0) {
-      pagina = 1;
-    }
-    this.pagina = pagina;
 
-    this.pokemonService.buscarPokemon(this.url).subscribe(dados => {
-      this.listaPokemonExibir = [];
-      this.totalPokemon = dados['count'];
+  public async buscarPokemons() {
+    await this.pokemonService.buscarPokemons().subscribe(dados => {
+      this.listaPokemonApi = [];
+      this.totalPaginas = dados['count'] / 10;
+
+      this.previous = dados['previous'];
+      this.next = dados['next'];
+
       let listaApi = dados['results'];
 
-      for (let pokemon of listaApi) {
-        this.pokemonService.buscaDePokemon(pokemon.url).subscribe(dadosPokemons => {
+      for (let item of listaApi) {
+        this.pokemonService.buscaPokemonNumero(item.url).subscribe(dadosPokemons => {
           this.listaPokemonExibir.push(dadosPokemons);
+
+          this.ordenarLista();
         });
       }
     });
+  }
+
+  private ordenarLista(){
+    this.listaPokemonApi.sort((a,b) => {
+      if(a.id > b.id) {
+        return 1;
+      }
+      if(a.id <b.id){
+        return -1;
+      }
+      return 0;
+    });
+    this.listaPokemonExibir=this.listaPokemonApi;
+  }
+
+  public paginacao(url, movimento){
+    this.pagina = this.pagina + movimento;
+    this.pokemonService.url = url;
+    this.buscarPokemons();
   }
 }

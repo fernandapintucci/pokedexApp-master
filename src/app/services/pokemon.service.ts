@@ -6,28 +6,15 @@ import { Injectable } from '@angular/core';
 })
 export class PokemonService {
 
-  private url = "https://pokeapi.co/api/v2/pokemon?limit=10&offset=0";
+  public url = "https://pokeapi.co/api/v2/pokemon?limit=10&offset=0";
 
   constructor(private httpClient: HttpClient) { }
 
-  // Código realizado com ajuda da aluna Sarita Breda
-
-  public BuscarTodos(pagina: number) {
-    if (pagina <= 0) {
-      pagina = 1;
-    }
-    return this.httpClient.get(`${this.url}?limit=10&offset=${pagina}`);
+  public buscarPokemons() {
+    return this.httpClient.get(this.url);
   }
 
-  public buscarPokemon(url: string) {
+  public buscaPokemonNumero(url: string) {
     return this.httpClient.get(url);
-  }
-
-  public buscaDePokemon(url: string) {
-    return this.httpClient.get(`${url}`);
-  }
-
-  public buscarPorId(id: number) {
-    return this.httpClient.get(`${this.url}/${id}`);
   }
 }
